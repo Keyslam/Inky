@@ -107,6 +107,9 @@ context:onPointer(name: string, callback: (pointer: Pointer, view: View, ...)) =
 context:onPointerEnter(name: string, callback: (pointer: Pointer)) => self
 context:onPointerExit(name: string, callback: (pointer: Pointer)) => self
 
+context:onEnable(callback: ()) => self
+context:onDisable(callback: ()) => self
+
 context:useOverlapCheck(predicate: (x: number, y: number, view: View): boolean) => self
 
 context:useState(initialValue: any): getter: () => any, setter: (value: any)
