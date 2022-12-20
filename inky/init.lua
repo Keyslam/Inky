@@ -25,8 +25,8 @@ local Inky = {
    ]]
 }
 
-Inky.scene   = require(PATH .. ".Core.Scene")
-Inky.pointer = require(PATH .. ".Core.Pointer")
-Inky.element = require(PATH .. ".Core.Element")
+Inky.scene   = require(PATH .. ".core.scene")
+Inky.pointer = require(PATH .. ".core.pointer")
+Inky.element = require(PATH .. ".core.element")
 
 return Inky
