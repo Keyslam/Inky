@@ -1,1 +1,1 @@
-require("examples.lifetime_hooks.main")
+require("examples.windows.main")

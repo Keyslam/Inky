@@ -118,13 +118,17 @@ function Context:onEnable(callback)
 end
 
 function Context:_handleEnable()
-	self._onEnableCallback()
+	if (self._onEnableCallback) then
+		self._onEnableCallback()
+	end
 end
 
 ---@param callback fun()
 ---@return Inky.Context self
 function Context:onDisable(callback)
-	self._onDisableCallback = callback
+	if (self._onDisableCallback) then
+		self._onDisableCallback = callback
+	end
 
 	return self
 end
