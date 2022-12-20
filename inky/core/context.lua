@@ -25,6 +25,9 @@ function Context:initialize(scene, view, props, elementWrapper)
 	self._onPointerEnterCallback = nil
 	self._onPointerExitCallback  = nil
 
+	self._onEnableCallback  = nil
+	self._onDisableCallback = nil
+
 	self._overlapPredicate = defaultOverlapPredicate
 
 	self._pointers = HashSet()
@@ -104,6 +107,30 @@ function Context:handleEmit(name, ...)
 	if (callback) then
 		callback(...)
 	end
+end
+
+---@param callback fun()
+---@return Inky.Context self
+function Context:onEnable(callback)
+	self._onEnableCallback = callback
+
+	return self
+end
+
+function Context:_handleEnable()
+	self._onEnableCallback()
+end
+
+---@param callback fun()
+---@return Inky.Context self
+function Context:onDisable(callback)
+	self._onDisableCallback = callback
+
+	return self
+end
+
+function Context:_handleDisable()
+	self._onDisableCallback()
 end
 
 ---Overrides the check for pointer overlap check

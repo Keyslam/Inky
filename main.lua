@@ -1,1 +1,1 @@
-require("examples.getting_started.main")
+require("examples.lifetime_hooks.main")

@@ -24,10 +24,17 @@ function Scene:newFrame()
 end
 
 function Scene:endFrame()
+	for i = 1, self.registeredContexts:count() do
+		local context = self.registeredContexts:getByIndex(i)
+		if (not self.previousRegisteredContexts:has(context)) then
+			context:_handleEnable()
+		end
+	end
+
 	for i = 1, self.previousRegisteredContexts:count() do
 		local context = self.previousRegisteredContexts:getByIndex(i)
 		if (not self.registeredContexts:has(context)) then
-
+			context:_handleDisable()
 		end
 	end
 
