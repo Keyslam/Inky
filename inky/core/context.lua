@@ -123,28 +123,68 @@ end
 ---@param pointer Inky.Pointer
 ---@return Inky.Context
 function Context:checkPointer(pointer)
+	local pointerActive = pointer:getActive()
+
+	if (pointerActive) then
+		self:_handleActivePointer(pointer)
+	else
+		self:_handleInactivePointer(pointer)
+	end
+
+	return self
+end
+
+---@param pointer Inky.Pointer
+---@return Inky.Context
+function Context:_handleActivePointer(pointer)
 	local pointerMode = pointer:getMode()
 
 	if (pointerMode == "TARGET") then
-		local isTarget = self._elementWrapper == pointer:getTarget()
-		local hasPointer = self:hasPointer(pointer)
-
-		if (isTarget and not hasPointer) then
-			self:addPointer(pointer)
-		elseif (not isTarget and hasPointer) then
-			self:removePointer(pointer)
-		end
+		self:_handleTargettingPointer(pointer)
 	elseif (pointerMode == "POSITION") then
-		local x, y = pointer:getPosition()
+		self:_handlePositionedPointer(pointer)
+	end
 
-		local overlap = self:doesOverlap(x, y)
-		local hasPointer = self:hasPointer(pointer)
+	return self
+end
 
-		if (overlap and not hasPointer) then
-			self:addPointer(pointer)
-		elseif (not overlap and hasPointer) then
-			self:removePointer(pointer)
-		end
+---@param pointer Inky.Pointer
+---@return Inky.Context
+function Context:_handleInactivePointer(pointer)
+	if (self:hasPointer(pointer)) then
+		self:removePointer(pointer)
+	end
+
+	return self
+end
+
+---@param pointer Inky.Pointer
+---@return Inky.Context
+function Context:_handlePositionedPointer(pointer)
+	local pointerX, pointerY = pointer:getPosition()
+
+	local overlap    = self:doesOverlap(pointerX, pointerY)
+	local hasPointer = self:hasPointer(pointer)
+
+	if (overlap and not hasPointer) then
+		self:addPointer(pointer)
+	elseif (not overlap and hasPointer) then
+		self:removePointer(pointer)
+	end
+
+	return self
+end
+
+---@param pointer Inky.Pointer
+---@return Inky.Context
+function Context:_handleTargettingPointer(pointer)
+	local isTarget   = self._elementWrapper == pointer:getTarget()
+	local hasPointer = self:hasPointer(pointer)
+
+	if (isTarget and not hasPointer) then
+		self:addPointer(pointer)
+	elseif (not isTarget and hasPointer) then
+		self:removePointer(pointer)
 	end
 
 	return self
