@@ -95,7 +95,7 @@ elementInstance.foo = "bar"
 // Or
 elementInstance:foo("bar")
 
-elementInstance(x: number, y: number, w: number, h: number) // Rendering
+elementInstance(x: number, y: number, w: number, h: number, depth: number) // Rendering
 ```
 
 ### Context
@@ -103,6 +103,7 @@ elementInstance(x: number, y: number, w: number, h: number) // Rendering
 ```typescript
 context:on(name: string, callback: (view: View, ...)) => self
 context:onPointer(name: string, callback: (pointer: Pointer, view: View, ...)) => self
+context:onPointerInhierarchy(name: string, callback: (pointer: Pointer, view: View, ...)) => self
 
 context:onPointerEnter(name: string, callback: (pointer: Pointer)) => self
 context:onPointerExit(name: string, callback: (pointer: Pointer)) => self
@@ -114,6 +115,8 @@ context:useOverlapCheck(predicate: (x: number, y: number, view: View): boolean) 
 
 context:useState(initialValue: any): getter: () => any, setter: (value: any)
 context:useEffect(effect: (), ...) => self
+
+context:capturePointer(name: string, shouldCapture: boolean) => self
 ```
 
 

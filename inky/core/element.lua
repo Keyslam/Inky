@@ -10,7 +10,7 @@ local View           = require(PATH .. "core.view")
 ---@field scene Inky.Scene
 ---@field props { [string]: any }
 ---@field view Inky.View
----@field render fun(view : Inky.View) | nil
+---@field render fun(view : Inky.View, depth: number) | nil
 ---@field context Inky.Context
 local Element   = {}
 local ElementMt = {
@@ -36,7 +36,7 @@ function Element.new(initializer, scene)
 	return elementWrapper
 end
 
-function Element:draw(xOrView, y, w, h)
+function Element:draw(xOrView, y, w, h, depth)
 	if (self.render == nil) then
 		self.render = self.initializer(
 			self.scene,
@@ -47,8 +47,9 @@ function Element:draw(xOrView, y, w, h)
 
 	self.view:set(xOrView, y, w, h)
 
-	self.context:hook()
-	self.render(self.view)
+	depth = self.context:begin(depth)
+	self.render(self.view, depth)
+	self.context:finish()
 end
 
 ---@generic T

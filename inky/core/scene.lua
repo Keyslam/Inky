@@ -13,12 +13,23 @@ function Scene:initialize(...)
 	self.pointers                   = HashSet()
 	self.previousRegisteredContexts = HashSet()
 	self.registeredContexts         = HashSet()
+
+	self._currentDepth = 0
+
+	self._parentStack = {}
+	self._parents = {}
 end
 
 function Scene:newFrame()
 	self:endFrame()
+
+	self._parentStack = {}
+	self._parents = {}
+
 	self.previousRegisteredContexts, self.registeredContexts = self.registeredContexts, self.previousRegisteredContexts
 	self.registeredContexts:clear()
+
+	self._currentDepth = 0
 
 	return self
 end
@@ -48,9 +59,32 @@ function Scene:endFrame()
 	end
 end
 
+function Scene:pushParent(parent)
+	self._parentStack[#self._parentStack + 1] = parent
+end
+
+function Scene:popParent()
+	self._parentStack[#self._parentStack] = nil
+end
+
+function Scene:getParentOf(context)
+	return self._parents[context]
+end
+
+function Scene:setCurrentDepth(depth)
+	self._currentDepth = depth
+end
+
+function Scene:getCurrentDepth()
+	return self._currentDepth
+end
+
 ---@param context Inky.Context
-function Scene:registerContext(context)
+function Scene:registerContext(context, depth)
 	self.registeredContexts:add(context)
+
+	local parent = self._parentStack[#self._parentStack]
+	self._parents[context] = parent
 end
 
 function Scene:onPointerChanged(pointer)
@@ -61,11 +95,28 @@ function Scene:onPointerChanged(pointer)
 end
 
 function Scene:onPointerEmit(pointer, name, ...)
+	local interestedContexts = {}
+
 	for i = 1, self.registeredContexts:count() do
 		local context = self.registeredContexts:getByIndex(i)
 
-		if (context:hasPointer(pointer)) then
-			context:handlePointerEmit(name, pointer, ...)
+		if (context:doesCapturePointerEvent(pointer, name)) then
+			table.insert(interestedContexts, context)
+		end
+	end
+
+	if (#interestedContexts > 0) then
+		table.sort(interestedContexts, function(a, b)
+			return a._depth > b._depth
+		end)
+
+		local context = interestedContexts[1]
+		context:handlePointerEmit(name, pointer, ...)
+
+		local parent = self:getParentOf(context)
+		while (parent ~= nil) do
+			parent:handleHierarchyEmit(name, pointer, ...)
+			parent = self:getParentOf(parent)
 		end
 	end
 end

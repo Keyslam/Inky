@@ -15,16 +15,18 @@ local POINTER_MODE = {
 ---@field _mode Inky.PointerMode
 ---@field _enabled boolean
 ---@field _scene Inky.Scene
+---@field _userdata any
 ---@operator call:Inky.Pointer
 local Pointer = Middleclass("Inky.Pointer")
 
-function Pointer:initialize(scene)
+function Pointer:initialize(scene, userdata)
 	self._x = 0
 	self._y = 0
 	self._target = nil
 	self._mode = POINTER_MODE.POSITION
 	self._active = true
 	self._scene = scene
+	self._userdata = userdata
 
 	self._scene:addPointer(self)
 end
@@ -108,6 +110,16 @@ function Pointer:emit(name, ...)
 	end
 
 	self._scene:onPointerEmit(self, name, ...)
+
+	return self
+end
+
+function Pointer:getUserdata()
+	return self._userdata
+end
+
+function Pointer:setUserData(userdata)
+	self._userdata = userdata
 
 	return self
 end

@@ -7,8 +7,8 @@ local WrapperMt = {
 		self._caller._field = key
 		self:_caller(value)
 	end,
-	__call = function(self, x, y, width, height)
-		self._element:draw(x, y, width, height)
+	__call = function(self, x, y, width, height, depth)
+		self._element:draw(x, y, width, height, depth)
 	end
 }
 

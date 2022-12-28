@@ -12,18 +12,24 @@ end
 local Context = Middleclass("Inky.Context")
 
 function Context:initialize(scene, view, props, elementWrapper)
-	self._scene = scene
-	self._props = props
-	self._view = view
+	self._scene          = scene
+	self._props          = props
+	self._view           = view
 	self._elementWrapper = elementWrapper
+
+	self._depth = nil
+	self._previousDepth = nil
 
 	self._effects = {}
 	self._state   = {}
 
-	self._callbacks              = {}
-	self._pointerCallbacks       = {}
-	self._onPointerEnterCallback = nil
-	self._onPointerExitCallback  = nil
+	self._callbacks                 = {}
+	self._pointerCallbacks          = {}
+	self._pointerHierarchyCallbacks = {}
+	self._onPointerEnterCallback    = nil
+	self._onPointerExitCallback     = nil
+
+	self._capturedPointerCallbacks = {}
 
 	self._onEnableCallback  = nil
 	self._onDisableCallback = nil
@@ -31,6 +37,10 @@ function Context:initialize(scene, view, props, elementWrapper)
 	self._overlapPredicate = defaultOverlapPredicate
 
 	self._pointers = HashSet()
+end
+
+function Context:getWrapper()
+	return self._elementWrapper
 end
 
 ---Run callback when an event with matching name is emitted from the scene
@@ -53,6 +63,15 @@ function Context:onPointer(name, callback)
 	return self
 end
 
+---@param name string
+---@param callback fun(pointer: Inky.Pointer, view: Inky.View)
+---@return Inky.Context self
+function Context:onPointerInHierarchy(name, callback)
+	self._pointerHierarchyCallbacks[name] = callback
+
+	return self
+end
+
 ---Run callback when a pointer enters
 ---@param callback fun(pointer: Inky.Pointer)
 ---@return Inky.Context self
@@ -71,8 +90,23 @@ function Context:onPointerExit(callback)
 	return self
 end
 
-function Context:hook()
-	self._scene:registerContext(self, self._view)
+function Context:begin(depth)
+	self._scene:registerContext(self, self._view, depth)
+	self._scene:pushParent(self)
+
+	self._previousDepth = self._scene:getCurrentDepth()
+	if (not depth) then
+		depth = self._previousDepth + 1
+	end
+	self._depth = depth
+	self._scene:setCurrentDepth(depth)
+
+	return depth
+end
+
+function Context:finish()
+	self._scene:setCurrentDepth(self._previousDepth)
+	self._scene:popParent(self)
 end
 
 function Context:hasPointer(pointer)
@@ -98,7 +132,7 @@ end
 function Context:handlePointerEmit(name, pointer, ...)
 	local callback = self._pointerCallbacks[name]
 	if (callback) then
-		callback(pointer, ...)
+		callback(pointer, self._view, ...)
 	end
 end
 
@@ -106,6 +140,13 @@ function Context:handleEmit(name, ...)
 	local callback = self._callbacks[name]
 	if (callback) then
 		callback(...)
+	end
+end
+
+function Context:handleHierarchyEmit(name, pointer, ...)
+	local callback = self._pointerHierarchyCallbacks[name]
+	if (callback) then
+		callback(pointer, self._view, ...)
 	end
 end
 
@@ -137,6 +178,18 @@ function Context:_handleDisable()
 	self._onDisableCallback()
 end
 
+function Context:capturePointer(name, shouldCapture)
+	shouldCapture = type(shouldCapture) == nil or shouldCapture
+
+	if (shouldCapture) then
+		self._capturedPointerCallbacks[name] = true
+	else
+		self._capturedPointerCallbacks[name] = nil
+	end
+
+	return self
+end
+
 ---Overrides the check for pointer overlap check
 ---Checks if 'x' and 'y' are within the view by default
 ---@param predicate fun(x: number, y:number, view: Inky.View): boolean
@@ -145,6 +198,18 @@ function Context:useOverlapCheck(predicate)
 	self._overlapPredicate = predicate
 
 	return self
+end
+
+function Context:doesCapturePointerEvent(pointer, name)
+	if (self._capturedPointerCallbacks[name]) then
+		return true
+	end
+
+	if (self:hasPointer(pointer)) then
+		return true
+	end
+
+	return false
 end
 
 function Context:doesOverlap(x, y)
