@@ -1,6 +1,8 @@
 local PATH = string.sub(..., 1, string.len(...) - string.len("core.context"))
 
+---@module "inky.lib.middleclass"
 local Middleclass = require(PATH .. "lib.middleclass")
+---@module "inky.lib.hashSet"
 local HashSet     = require(PATH .. "lib.hashSet")
 
 local defaultOverlapPredicate = function(x, y, view)

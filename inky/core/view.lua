@@ -1,5 +1,6 @@
 local PATH = string.sub(..., 1, string.len(...) - string.len("core.view"))
 
+---@module "inky.lib.middleclass"
 local Middleclass = require(PATH .. "lib.middleclass")
 
 ---@class Inky.View

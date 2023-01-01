@@ -1,3 +1,6 @@
 local PATH = (...):gsub('%.init$', '')
 
-return require(PATH .. ".inky")
+---@module "inky"
+local Inky = require(PATH .. ".inky")
+
+return Inky

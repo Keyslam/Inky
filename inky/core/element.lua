@@ -1,8 +1,12 @@
 local PATH = string.sub(..., 1, string.len(...) - string.len("core.element"))
 
+---@module "inky.core.elementWrapper"
 local ElementWrapper = require(PATH .. "core.elementWrapper")
+---@module "inky.core.caller"
 local Caller         = require(PATH .. "core.caller")
+---@module "inky.core.context"
 local Context        = require(PATH .. "core.context")
+---@module "inky.core.view"
 local View           = require(PATH .. "core.view")
 
 ---@class Inky.Element

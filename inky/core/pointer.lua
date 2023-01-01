@@ -1,5 +1,6 @@
 local PATH = string.sub(..., 1, string.len(...) - string.len("core.pointer"))
 
+---@module "inky.lib.middleclass"
 local Middleclass = require(PATH .. "lib.middleclass")
 
 ---@enum Inky.PointerMode
