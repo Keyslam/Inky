@@ -17,14 +17,16 @@ function love.update(dt)
 end
 
 function love.draw()
-	scene:newFrame()
+	scene:beginFrame()
 
-	button_1(10, 10, 200, 16)
-	button_2(10, 40, 200, 16)
+	button_1:render(10, 10, 200, 16)
+	button_2:render(10, 40, 200, 16)
+
+	scene:finishFrame()
 end
 
 function love.mousereleased(x, y, button)
 	if (button == 1) then
-		pointer:emit("release")
+		pointer:raise("release")
 	end
 end

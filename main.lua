@@ -1,1 +1,1 @@
-require("examples.windows.main")
+require("examples.menu.main")

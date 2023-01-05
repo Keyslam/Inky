@@ -1,11 +1,11 @@
 local PATH = (...):gsub('%.init$', '')
 
 local Inky = {
-	_VERSION     = "0.1",
+	_VERSION     = "1.0",
 	_DESCRIPTION = "A GUI Framework for LÖVE",
 	_LICENCE     = [[
 		MIT LICENSE
-		Copyright (c) 2022 Justin van der Leij (Keyslam)
+		Copyright (c) 2023 Justin van der Leij (Keyslam)
 		Permission is hereby granted, free of charge, to any person obtaining a
 		copy of this software and associated documentation files (the
 		"Software"), to deal in the Software without restriction, including
@@ -25,8 +25,11 @@ local Inky = {
    ]]
 }
 
-Inky.scene   = require(PATH .. ".core.scene")
+---@module "inky.core.scene"
+Inky.scene = require(PATH .. ".core.scene")
+---@module "inky.core.pointer"
 Inky.pointer = require(PATH .. ".core.pointer")
-Inky.element = require(PATH .. ".core.element")
+---@module "inky.core.defineElement"
+Inky.defineElement = require(PATH .. ".core.defineElement")
 
 return Inky

@@ -1,14 +1,16 @@
 local PATH = string.sub(..., 1, string.len(...) - string.len("lib.hashSet"))
 
-local Middleclass = require(PATH .. "lib.middleclass")
+---@module "inky.lib.class"
+local Class = require(PATH .. "lib.class")
+
 
 ---@class Inky.HashSet
 ---@field _indices { [any]: number }
 ---@field _elements any[]
 ---@operator call:Inky.HashSet
-local HashSet = Middleclass("Inky.Hashset")
+local HashSet = Class()
 
-function HashSet:initialize()
+function HashSet:constructor()
 	self._indices  = {}
 	self._elements = {}
 end
@@ -39,11 +41,17 @@ function HashSet:remove(element)
 	local index = self._indices[element]
 	local lastIndex = #self._elements
 
-	-- Copy last element into place of removed element, then remove the last element
-	-- This works out even if the to be removed element is the last element
-	self._indices[element]    = nil
-	self._elements[index]     = self._elements[lastIndex]
-	self._elements[lastIndex] = nil
+	if (index == lastIndex) then
+		self._elements[index]  = nil
+		self._indices[element] = nil
+	else
+		local lastElement = self._elements[lastIndex]
+
+		self._elements[index]      = lastElement
+		self._elements[lastIndex]  = nil
+		self._indices[element]     = nil
+		self._indices[lastElement] = index
+	end
 
 	return self
 end
@@ -85,6 +93,24 @@ function HashSet:clear()
 	end
 
 	return self
+end
+
+---Compute the difference between 2 sets
+---@param other Inky.HashSet
+---@param out? table
+---@return table
+---@nodiscard
+function HashSet:difference(other, out)
+	out = out or {}
+
+	for i = 1, self:count() do
+		local element = self:getByIndex(i)
+		if (not other:has(element)) then
+			out[#out + 1] = element
+		end
+	end
+
+	return out
 end
 
 return HashSet
