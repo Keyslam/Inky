@@ -1,1 +1,1 @@
-require("examples.menu.main")
+require("examples.text_input.main")
