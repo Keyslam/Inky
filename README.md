@@ -31,7 +31,7 @@ return Inky.defineElement(function(self)
 	end)
 
 	return function(_, x, y, w, h)
-		love.graphics.rectangle("line", view.x, view.y, view.w, view.h)
+		love.graphics.rectangle("line", x, y, w, h)
 		love.graphics.printf("I have been clicked " .. self.props.count .. " times", x, y, w, "center")
 	end
 end)
