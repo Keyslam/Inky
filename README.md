@@ -70,7 +70,7 @@ end
 
 function love.mousereleased(x, y, button)
 	if (button == 1) then
-		pointer:emit("release")
+		pointer:raise("release")
 	end
 end
 
