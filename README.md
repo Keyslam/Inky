@@ -26,13 +26,13 @@ local Inky = require("inky")
 return Inky.defineElement(function(self)
 	self.props.count = 0
 
-	context:onPointer("release", function()
+	self:onPointer("release", function()
 		self.props.count = self.props.count + 1
 	end)
 
 	return function(_, x, y, w, h)
-		love.graphics.rectangle("line", view.x, view.y, view.w, view.h)
-		love.graphics.printf("I have been clicked " .. self.props.count .. " times", view.x, view.y, view.w, "center")
+		love.graphics.rectangle("line", x, y, w, h)
+		love.graphics.printf("I have been clicked " .. self.props.count .. " times", x, y, w, "center")
 	end
 end)
 
@@ -62,15 +62,15 @@ end
 function love.draw()
 	scene:beginFrame()
 
-	button_1(10, 10, 200, 16)
-	button_2(10, 40, 200, 16)
+	button_1:render(10, 10, 200, 16)
+	button_2:render(10, 40, 200, 16)
 
 	scene:finishFrame()
 end
 
 function love.mousereleased(x, y, button)
 	if (button == 1) then
-		pointer:emit("release")
+		pointer:raise("release")
 	end
 end
 
