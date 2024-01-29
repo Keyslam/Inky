@@ -58,7 +58,7 @@ end
 ---@param y number
 ---@return self
 function Internal:setPosition(x, y)
-	if (self._x == x and self._y == y and self._mode == PointerMode.POSITION) then
+	if (self._x == x and self._y == y and self._mode == PointerMode.POSITION) or (self._target ~= nil) then
 		return self
 	end
 
@@ -82,12 +82,12 @@ end
 ---@param target Inky.Element
 ---@return self
 function Internal:setTarget(target)
-	if (self._target ~= target) then
+	if (self._target == target) then
 		return self
 	end
 
 	self._target = target
-	self._mode = PointerMode.TARGET
+	self._mode = target == nil and PointerMode.POSITION or PointerMode.TARGET
 
 	self._scene:__getInternal():onPointerTargetChanged(self._pointer)
 
