@@ -25,16 +25,16 @@ local Props = require(PATH .. "core.props")
 ---@field private _h number
 ---@field private _depth number
 ---
----@field private _onCallbacks { [string]: Inky.Element.OnCallback }
+---@field private _onCallbacks { [string]: Inky.Element.OnCallback[] }
 ---
----@field private _onPointerCallbacks { [string]: Inky.Element.OnPointerCallback }
----@field private _onPointerInHierarchyCallbacks { [string]: Inky.Element.OnPointerCallback }
+---@field private _onPointerCallbacks { [string]: Inky.Element.OnPointerCallback[] }
+---@field private _onPointerInHierarchyCallbacks { [string]: Inky.Element.OnPointerCallback[] }
 ---
----@field private _onPointerEnterCallback? Inky.Element.OnPointerEnterCallback
----@field private _onPointerExitCallback? Inky.Element.OnPointerExitCallback
+---@field private _onPointerEnterCallbacks Inky.Element.OnPointerEnterCallback[]
+---@field private _onPointerExitCallbacks Inky.Element.OnPointerExitCallback[]
 ---
----@field private _onEnableCallback? Inky.Element.OnEnableCallback
----@field private _onDisableCallback? Inky.Element.OnDisableCallback
+---@field private _onEnableCallbacks Inky.Element.OnEnableCallback[]
+---@field private _onDisableCallbacks Inky.Element.OnDisableCallback[]
 ---
 ---@field private _effects { [string]: Inky.Element.Effect[] }
 ---
@@ -68,11 +68,11 @@ function Internal:constructor(element, scene, initializer)
 	self._onPointerCallbacks            = {}
 	self._onPointerInHierarchyCallbacks = {}
 
-	self._onPointerEnterCallback = nil
-	self._onPointerExitCallback  = nil
+	self._onPointerEnterCallbacks = {}
+	self._onPointerExitCallbacks  = {}
 
-	self._onEnableCallback  = nil
-	self._onDisableCallback = nil
+	self._onEnableCallbacks  = {}
+	self._onDisableCallbacks = {}
 
 	self._effects = {}
 end
@@ -114,7 +114,10 @@ end
 ---@param callback Inky.Element.OnCallback
 ---@return self
 function Internal:on(eventName, callback)
-	self._onCallbacks[eventName] = callback
+	if (not self._onCallbacks[eventName]) then
+		self._onCallbacks[eventName] = {}
+	end
+	table.insert(self._onCallbacks[eventName], callback)
 	return self
 end
 
@@ -122,7 +125,10 @@ end
 ---@param callback Inky.Element.OnPointerCallback
 ---@return self
 function Internal:onPointer(eventName, callback)
-	self._onPointerCallbacks[eventName] = callback
+	if (not self._onPointerCallbacks[eventName]) then
+		self._onPointerCallbacks[eventName] = {}
+	end
+	table.insert(self._onPointerCallbacks[eventName], callback)
 	return self
 end
 
@@ -130,35 +136,38 @@ end
 ---@param callback Inky.Element.OnPointerInHierarchyCallback
 ---@return self
 function Internal:onPointerInHierarchy(eventName, callback)
-	self._onPointerInHierarchyCallbacks[eventName] = callback
+	if (not self._onPointerInHierarchyCallbacks[eventName]) then
+		self._onPointerInHierarchyCallbacks[eventName] = {}
+	end
+	table.insert(self._onPointerInHierarchyCallbacks[eventName], callback)
 	return self
 end
 
 ---@param callback Inky.Element.OnPointerEnterCallback
 ---@return self
 function Internal:onPointerEnter(callback)
-	self._onPointerEnterCallback = callback
+	self._onPointerEnterCallbacks[#self._onPointerEnterCallbacks + 1] = callback
 	return self
 end
 
 ---@param callback Inky.Element.OnPointerExitCallback
 ---@return self
 function Internal:onPointerExit(callback)
-	self._onPointerExitCallback = callback
+	self._onPointerExitCallbacks[#self._onPointerExitCallbacks + 1] = callback
 	return self
 end
 
 ---@param callback? Inky.Element.OnEnableCallback
 ---@return self
 function Internal:onEnable(callback)
-	self._onEnableCallback = callback
+	self._onEnableCallbacks[#self._onEnableCallbacks + 1] = callback
 	return self
 end
 
 ---@param callback? Inky.Element.OnDisableCallback
 ---@return self
 function Internal:onDisable(callback)
-	self._onDisableCallback = callback
+	self._onDisableCallbacks[#self._onDisableCallbacks + 1] = callback
 	return self
 end
 
@@ -193,9 +202,11 @@ end
 ---@return boolean accepted
 ---@nodiscard
 function Internal:raiseOn(eventName, ...)
-	local callback = self._onCallbacks[eventName]
-	if (callback) then
-		callback(self._element, ...)
+	local callbacks = self._onCallbacks[eventName]
+	if (callbacks) then
+		for _, callback in ipairs(callbacks) do
+			callback(self._element, ...)
+		end
 		return true
 	end
 	return false
@@ -208,9 +219,11 @@ end
 ---@return boolean consumed
 ---@nodiscard
 function Internal:raiseOnPointer(eventName, pointer, ...)
-	local callback = self._onPointerCallbacks[eventName]
-	if (callback) then
-		callback(self._element, pointer, ...)
+	local callbacks = self._onPointerCallbacks[eventName]
+	if (callbacks) then
+		for _, callback in ipairs(callbacks) do
+			callback(self._element, pointer, ...)
+		end
 		return true, true
 	end
 	return false, false
@@ -222,9 +235,11 @@ end
 ---@return boolean accepted
 ---@nodiscard
 function Internal:raiseOnPointerInHierarchy(eventName, pointer, ...)
-	local callback = self._onPointerInHierarchyCallbacks[eventName]
-	if (callback) then
-		callback(self._element, pointer, ...)
+	local callbacks = self._onPointerInHierarchyCallbacks[eventName]
+	if (callbacks) then
+		for _, callback in ipairs(callbacks) do
+			callback(self._element, pointer, ...)
+		end
 		return true
 	end
 	return false
@@ -234,42 +249,38 @@ end
 ---@return boolean accepted
 ---@nodiscard
 function Internal:raisePointerEnter(pointer)
-	if (self._onPointerEnterCallback) then
-		self._onPointerEnterCallback(self._element, pointer)
-		return true
+	for _, callback in ipairs(self._onPointerEnterCallbacks) do
+		callback(self._element, pointer)
 	end
-	return false
+	return #self._onPointerEnterCallbacks > 0
 end
 
 ---@param pointer Inky.Pointer
 ---@return boolean accepted
 ---@nodiscard
 function Internal:raisePointerExit(pointer)
-	if (self._onPointerExitCallback) then
-		self._onPointerExitCallback(self._element, pointer)
-		return true
+	for _, callback in ipairs(self._onPointerExitCallbacks) do
+		callback(self._element, pointer)
 	end
-	return false
+	return #self._onPointerExitCallbacks > 0
 end
 
 ---@return boolean accepted
 ---@nodiscard
 function Internal:raiseEnable()
-	if (self._onEnableCallback) then
-		self._onEnableCallback(self._element)
-		return true
+	for _, callback in ipairs(self._onEnableCallbacks) do
+		callback(self._element)
 	end
-	return false
+	return #self._onEnableCallbacks > 0
 end
 
 ---@return boolean accepted
 ---@nodiscard
 function Internal:raiseDisable()
-	if (self._onDisableCallback) then
-		self._onDisableCallback(self._element)
-		return true
+	for _, callback in ipairs(self._onDisableCallbacks) do
+		callback(self._element)
 	end
-	return false
+	return #self._onDisableCallbacks > 0
 end
 
 ---@param x number
