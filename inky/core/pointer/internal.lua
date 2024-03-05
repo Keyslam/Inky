@@ -82,7 +82,7 @@ end
 ---@param target Inky.Element
 ---@return self
 function Internal:setTarget(target)
-	if (self._target ~= target) then
+	if (self._target == target) then
 		return self
 	end
 
