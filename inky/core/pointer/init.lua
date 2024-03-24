@@ -96,6 +96,14 @@ function Pointer:doesOverlapElement(element)
 	return self._internal:doesOverlapElement(element)
 end
 
+---Get if the Pointer overlaps any Elements
+---
+---@return boolean
+---@nodiscard
+function Pointer:doesOverlapAnyElement()
+	return self._internal:doesOverlapAnyElement()
+end
+
 ---Raise a Pointer event, to be caught by Elements
 ---\
 ---@see Inky.Element.onPointer

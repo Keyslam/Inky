@@ -133,6 +133,10 @@ function Internal:doesOverlapElement(element)
 	return self._overlappingElements:has(element)
 end
 
+function Internal:doesOverlapAnyElement()
+	return self._overlappingElements:count() ~= 0
+end
+
 do
 	---@param a Inky.Element
 	---@param b Inky.Element

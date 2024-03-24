@@ -148,6 +148,7 @@ pointer:setActive(active)
 active = pointer:isActive()
 
 doesOverlapElement = pointer:doesOverlapElement(element)
+doesOverlapAnyElement = pointer:doesOverlapAnyElement()
 
 consumed = pointer:raise(eventName, ...)
 
@@ -369,6 +370,7 @@ local doesCaptureElement = pointer:doesCaptureElement(element)
 Pointers know which Elements it is overlapping
 ```lua
 local doesOverlapElement = pointer:doesOverlapElement(element)
+local doesOverlapAnyElement = pointer:doesOverlapAnyElement()
 ```
 
 ### Creating a Scene
