@@ -149,7 +149,7 @@ active = pointer:isActive()
 
 doesOverlapElement = pointer:doesOverlapElement(element)
 
-pointer:raise(eventName, ...)
+consumed = pointer:raise(eventName, ...)
 
 pointer:captureElement(element, shouldCapture)
 doesCaptureElement = pointer:doesCaptureElement(element)
@@ -347,9 +347,10 @@ local isActive = pointer:isActive()
 ### Raising Pointer Events
 Pointer Events can be raised to be [caught by Elements](#responding-to-events).
 Pointer Events are sent to the Element with the highest depth first. When an Element listens to the Event it is consumed, and won't be sent to any other Elements.
+If the event was consumed by any element, this function returns `true`. Otherwise it returns `false`.
 
 ```lua
-pointer:raise(eventName, ...)
+consumed = pointer:raise(eventName, ...)
 ```
 
 ### Pointer capturing Elements

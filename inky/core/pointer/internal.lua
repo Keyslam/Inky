@@ -143,7 +143,7 @@ do
 
 	---@param eventName string
 	---@param ... any
-	---@return self
+	---@return boolean
 	function Internal:raise(eventName, ...)
 		---@type Inky.Element[]
 		local elements = {}
@@ -179,11 +179,11 @@ do
 			end
 
 			if (consumed) then
-				break
+				return true
 			end
 		end
 
-		return self
+		return false
 	end
 end
 

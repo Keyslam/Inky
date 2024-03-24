@@ -103,10 +103,9 @@ end
 ---
 ---@param eventName string
 ---@param ... any
----@return self
+---@return boolean
 function Pointer:raise(eventName, ...)
-	self._internal:raise(eventName, ...)
-	return self
+	return self._internal:raise(eventName, ...)
 end
 
 ---Capture a Element, meaning all raised events will be able to be sent to it, even if it's not being hovered
