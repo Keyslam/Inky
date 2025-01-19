@@ -12,7 +12,7 @@ local mt = {
 
 ---Create a Class
 ---@return table
-return function(name)
+return function()
 	local class = {
 		new = new
 	}

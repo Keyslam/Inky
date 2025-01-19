@@ -99,7 +99,6 @@ end
 ---@param other Inky.HashSet
 ---@param out? table
 ---@return table
----@nodiscard
 function HashSet:difference(other, out)
 	out = out or {}
 

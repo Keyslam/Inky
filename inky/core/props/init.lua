@@ -1,8 +1,5 @@
 local PATH = string.sub(..., 1, string.len(...) - string.len("core.props"))
 
----@module "inky.lib.hashSet"
-local HashSet = require(PATH .. "lib.hashSet")
-
 ---@module "inky.core.props.internal"
 local Internal = require(PATH .. "core.props.internal")
 
