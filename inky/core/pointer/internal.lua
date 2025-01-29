@@ -109,7 +109,7 @@ end
 ---@param active boolean
 ---@return self
 function Internal:setActive(active)
-	if (self._active ~= active) then
+	if (self._active == active) then
 		return self
 	end
 

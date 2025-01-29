@@ -1,1 +1,1 @@
-require("examples.menu.main")
+require("examples.game_menu.main")
