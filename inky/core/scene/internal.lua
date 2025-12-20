@@ -238,6 +238,30 @@ function Internal:getElementParent(element)
 	return self._parents[element]
 end
 
+---Check if element is a descendant of possibleParent
+---@param element Inky.Element
+---@param possibleParent Inky.Element
+---@return boolean
+---@nodiscard
+function Internal:isElementAChildOf(element, possibleParent)
+	local actualParent = self:getElementParent(element)
+
+	-- Bounded to avoid potential infinite loops from cyclical references
+	for _ = 1, 64 do
+		if (not actualParent) then
+			return false
+		end
+
+		if (actualParent == possibleParent) then
+			return true
+		end
+
+		actualParent = self:getElementParent(actualParent)
+	end
+
+	return false
+end
+
 ---@param element Inky.Element
 ---@return self
 ---@private

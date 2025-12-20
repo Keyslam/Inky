@@ -152,17 +152,38 @@ do
 		---@type Inky.Element[]
 		local elements = {}
 
-		for i = 1, self._overlappingElements:count() do
-			---@type Inky.Element
-			local element = self._overlappingElements:getByIndex(i)
-			elements[i] = element
-		end
+		local numCaptured = self._capturedElements:count()
 
-		for i = 1, self._capturedElements:count() do
+		for i = 1, numCaptured do
 			---@type Inky.Element
 			local element = self._capturedElements:getByIndex(i)
 
-			if (not self._overlappingElements:has(element)) then
+			elements[#elements + 1] = element
+		end
+
+		local sceneInternal = assert(self._scene):__getInternal()
+
+		for i = 1, self._overlappingElements:count() do
+			---@type Inky.Element
+			local element = self._overlappingElements:getByIndex(i)
+
+			local addToElements = true
+
+			-- If the number of captured elements is more than zero,
+			-- element will only be added if it is a descendant of any captured element.
+			if (numCaptured > 0) then
+				addToElements = false
+				if (not self._capturedElements:has(element)) then
+					for j = 1, numCaptured do
+						addToElements = sceneInternal:isElementAChildOf(element, self._capturedElements:getByIndex(j))
+						if (addToElements) then
+							break
+						end
+					end
+				end
+			end
+
+			if (addToElements) then
 				elements[#elements + 1] = element
 			end
 		end
